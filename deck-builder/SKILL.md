@@ -5,45 +5,37 @@ description: Use when the user wants to generate, build, or draft a branded clie
 
 # Deck Builder
 
-Drafts a full client presentation and renders it into a real `.pptx` file using the
-user's real corporate theme and layouts (set up via the `deck-theme-setup` skill).
+Drafts a full client presentation and renders it into a real `.pptx` by opening the user's
+real corporate template and adding slides built from its own layouts (set up via
+`deck-theme-setup`). Logos, brand graphics, and backgrounds come from the template itself.
 
 ## Prerequisites
 
-Check that `theme.json` exists next to this skill. If it doesn't, tell the user to run
-the `deck-theme-setup` skill first and stop here.
+- Python 3 and `python-pptx` (`pip install -r requirements.txt` in this folder if
+  `python -c "import pptx"` fails).
+- `deck-config.json` exists next to this skill. If not, tell the user to run
+  `deck-theme-setup` first and stop here.
 
 ## Steps
 
-All commands and paths below are relative to this skill's folder — run them from there
-(the directory containing this SKILL.md), where `theme.json` lives.
+All commands and paths are relative to this skill's folder, where `deck-config.json` and
+`templates/` live.
 
-1. Read `theme.json` and list the available theme variant names to the user; ask which
-   one to use for this deck.
-2. Gather the brief in one upfront round — ask for whatever of the following the user
-   hasn't already given you: client name, industry, **audience / persona** (see the
-   Personas section below), goal, known pain points, products/solutions of interest,
-   target slide count (default 8-12). Also accept (optional) pasted meeting notes/email
-   thread, or a path to a local notes file — fold that directly into your understanding
-   rather than asking redundant questions. If the audience is obvious from the brief
-   (e.g. "pitching their CISO"), infer the persona and confirm it in one line rather
-   than asking cold.
-3. Draft the full slide-by-slide outline yourself, in one pass, **applying the chosen
-   persona's tuning** (tone, depth, which roles to emphasize, default length). For each
-   slide decide: `role` (one of: title, agenda, section, problem, solution, product,
-   case-study, roi, next-steps, thank-you, content), `title`, optional
-   `subtitle`/`bullets`/`body`, and `imageCount` (0 unless the user asked for image
-   space on that slide).
-   - First slide: role `title`.
-   - Always include at least one `problem` slide grounded in the stated pain points, at
-     least one `solution`/`product` slide mapping your product capabilities to those pain
-     points, and close with `next-steps` and `thank-you`.
-   - Keep bullets concise (under ~12 words each) unless the persona or user asks for more
-     depth.
-   - Note: `section` and `product` have no learned layout preference (the theme-setup
-     classifier never produces them), so they fall back to a generic layout unless you
-     set a `rolePreference` for them manually in `theme.json`.
-4. Write the drafted slides to a temporary JSON file matching this shape:
+1. Read `deck-config.json`, list the variant names, and ask which to use.
+2. Gather the brief in one round: client name, industry, audience/persona (see Personas),
+   goal, pain points, products of interest, target slide count (default 8-12). Accept
+   pasted notes or a notes file path. Infer the persona from the audience and confirm in
+   one line rather than asking cold.
+3. Draft the full slide list yourself, applying the persona's tuning. Each slide:
+   `role` (title, agenda, section, problem, solution, product, case-study, roi,
+   next-steps, thank-you, content), `title`, optional `subtitle`/`bullets`/`body`, and
+   `imageCount`.
+   - First slide: role `title`. Include at least one `problem` and one `solution`/`product`
+     slide, and close with `next-steps` and `thank-you`.
+   - Write as much substance as the brief and persona warrant — bullets can carry real
+     detail (a headline plus a clause). Keep each bullet to one idea; lean tighter for the
+     Executive persona, richer for Technical.
+4. Write the slides to a temporary JSON file:
    ```json
    [
      { "role": "title", "title": "...", "subtitle": "..." },
@@ -52,46 +44,33 @@ All commands and paths below are relative to this skill's folder — run them fr
    ```
 5. Run:
    ```
-   node scripts/generate-pptx.js theme.json <slides.json> <variantId> <output-path>.pptx
+   python scripts/build_deck.py deck-config.json <slides.json> <variantId> decks/<client>-<date>.pptx
    ```
-   `<variantId>` is the short id from `theme.json` (the one chosen in `deck-theme-setup`),
-   not the display name. Pick `<output-path>` under a `decks/` folder next to this skill,
-   named from the client name and today's date (e.g. `decks/acme-corp-2026-06-23.pptx`).
-6. Tell the user the deck is ready and where the file is.
-7. For edit requests ("make slide 4 two-column," "punch up slide 2"), update your
-   in-memory draft, rewrite the slides JSON, and re-run step 5 to regenerate the file.
+   `<variantId>` is the short id from `deck-config.json`, not the display name.
+6. Tell the user the deck is ready and where it is.
+7. For edits ("make slide 4 two-column," "shorten for execs"), update the draft, rewrite
+   the slides JSON, and re-run step 5.
 
 ## Personas
 
-A persona tunes *how you write the content* — tone, depth, which slide roles to
-emphasize, and default length. It does not change the layouts or theme. Ask the user to
-pick one (or infer it from the audience and confirm). Default to **Executive** if
-unspecified.
+A persona tunes *how you write* — tone, depth, role emphasis, length. Ask or infer;
+default to Executive.
 
-- **Executive / business case** — audience: CxO, VP, board. Lead with outcomes, risk
-  reduction, and ROI/TCO; minimal jargon. Emphasize `problem`, `solution`, `roi`,
-  `next-steps`. Fewer, denser slides (~6-9); ≤4 bullets/slide, short and declarative.
-- **CISO / security leadership** — audience: CISO, security directors. Frame around
-  threat landscape, risk posture, compliance, and operational impact. Emphasize
-  `problem`, `solution`, `case-study`, `roi`. Moderate depth (~8-11 slides);
-  security-outcome language over feature lists.
-- **Technical deep-dive** — audience: architects, engineers, security operations. Cover
-  architecture, integrations, deployment, and how it actually works. Emphasize
-  `solution`, `product`, `case-study`, plus extra `content` slides. More depth per slide
-  (5-6 bullets ok, longer `body` allowed); ~10-14 slides.
-- **Discovery / first meeting** — audience: mixed, early-stage. Broad and benefit-led,
-  light on detail, strong `agenda` and `next-steps`. Emphasize `agenda`, `problem`,
-  `solution`, `next-steps`. Shorter (~6-8 slides); leave room to ask questions rather
-  than tell everything.
-
-If the user describes an audience that doesn't fit cleanly, pick the closest persona,
-say which you chose, and adapt. The user can always say "make it more technical" or
-"shorten it for execs" and you re-draft.
+- **Executive / business case** — CxO/board. Outcomes, risk, ROI/TCO; minimal jargon.
+  Emphasize `problem`, `solution`, `roi`, `next-steps`. ~6-9 slides, ≤4 tight bullets.
+- **CISO / security leadership** — threat landscape, risk posture, compliance, ops impact.
+  Emphasize `problem`, `solution`, `case-study`, `roi`. ~8-11 slides.
+- **Technical deep-dive** — architects/engineers. Architecture, integrations, deployment.
+  Emphasize `solution`, `product`, `case-study`, extra `content`. ~10-14 slides, deeper.
+- **Discovery / first meeting** — broad, benefit-led, light on detail. Emphasize `agenda`,
+  `problem`, `solution`, `next-steps`. ~6-8 slides.
 
 ## Notes
 
-- This skill never needs internet access or any local LLM — you (Claude) write the
-  content directly.
-- No AI image generation. `imageCount` only reserves a labeled placeholder box on
-  layouts that actually have a picture placeholder; it does nothing on layouts without
-  one.
+- Never needs internet access or any local LLM — you (Claude) write the content directly.
+- Long text auto-shrinks to fit a placeholder (word-wrap + auto-fit), so content scales
+  rather than spilling over the design.
+- No AI image generation. Picture placeholders in the chosen layout are left as the
+  template's own native prompt; nothing is drawn into them.
+- `section` and `product` may have no learned layout preference (the classifier never
+  produces them); they fall back to a body-bearing layout unless set in `rolePreferences`.

@@ -1,4 +1,7 @@
-node_modules/
+__pycache__/
+*.pyc
+.venv/
 .DS_Store
-**/theme.json
+**/templates/
 **/decks/
+deck-config.json

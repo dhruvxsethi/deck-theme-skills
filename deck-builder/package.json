@@ -1,9 +1,0 @@
-{
-  "name": "deck-builder",
-  "version": "1.0.0",
-  "private": true,
-  "dependencies": {
-    "pptxgenjs": "^3.12.0",
-    "jszip": "^3.10.1"
-  }
-}
