@@ -45,18 +45,28 @@ layouts out of *your* `.pptx`/`.potx` template and produce decks that match it.
 
 ## Install
 
-Copy both skill folders into your Claude Code skills directory and install dependencies:
+Get the skills onto the machine where you'll build decks (e.g. your work laptop), copy
+them into your Claude Code skills directory, and install dependencies:
 
 ```bash
-# 1. Copy the two folders to your Claude Code skills directory
+# 1. Get the skills (clone, or "Code → Download ZIP" on GitHub and unzip)
+git clone https://github.com/dhruvxsethi/deck-theme-skills.git
+cd deck-theme-skills
+
+# 2. Copy the two skill folders to your Claude Code skills directory
 cp -R deck-theme-setup deck-builder ~/.claude/skills/
 
-# 2. Install dependencies in each (one time)
+# 3. Install dependencies in each (one time)
 cd ~/.claude/skills/deck-theme-setup && npm install
 cd ~/.claude/skills/deck-builder    && npm install
 ```
 
-That's it. Claude Code auto-discovers the skills from their `SKILL.md` files.
+That's it. Claude Code auto-discovers the skills from their `SKILL.md` files — you never
+run the scripts yourself; you just talk to Claude (see Usage below) and it runs them.
+
+> The skill folders contain only instructions and small Node.js scripts — nothing
+> sensitive — so they're safe to move however you normally move files between your own
+> devices (cloud drive, AirDrop, USB, `git clone`, …).
 
 > The skill folders contain only instructions and small Node.js scripts — nothing
 > sensitive — so they're safe to move however you normally move files between your own
