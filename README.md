@@ -80,12 +80,16 @@ python scripts/build_deck.py deck-config.json ./slides.json brand-light ./decks/
 ```json
 [
   { "role": "title",      "title": "Acme — Security Review", "subtitle": "June 2026" },
-  { "role": "problem",    "title": "Current Challenges",     "bullets": ["Alert fatigue across siloed tools", "Mean-time-to-respond averaging ~4 days"] },
+  { "role": "problem",    "title": "Current Challenges",     "bullets": ["Alert fatigue across siloed tools", "Mean-time-to-respond averaging ~4 days"], "notes": "Anchor on the MTTR gap — tie it back to the discovery call." },
   { "role": "solution",   "title": "A Unified Approach",     "bullets": ["Consolidate detection in one console", "Automate triage and response"] },
   { "role": "next-steps", "title": "Next Steps",             "bullets": ["Scoping workshop", "30-day pilot"] },
   { "role": "thank-you",  "title": "Thank You",              "subtitle": "Questions?" }
 ]
 ```
+
+Each slide can also carry `notes` (a speaker talk-track written into the slide's notes
+pane) and `imageCount`. Claude drafts all of this from your brief plus any context you
+give it — pasted meeting/Zoom notes, a call transcript, client background, or a file path.
 
 ## `deck-config.json` shape
 

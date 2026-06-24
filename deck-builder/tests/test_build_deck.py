@@ -86,6 +86,13 @@ class TestFillSlide(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "isn't a list"):
             fill_slide(slide, {"role": "problem", "title": "X", "bullets": "not a list"})
 
+    def test_adds_speaker_notes(self):
+        slide = self._slide("Title and Content")
+        fill_slide(slide, {"role": "problem", "title": "X", "bullets": ["a"],
+                           "notes": "Open with the MTTR stat, then pause."})
+        self.assertEqual(slide.notes_slide.notes_text_frame.text,
+                         "Open with the MTTR stat, then pause.")
+
 
 class TestBuildDeck(unittest.TestCase):
     def setUp(self):

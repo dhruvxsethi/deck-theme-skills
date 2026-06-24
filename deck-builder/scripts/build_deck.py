@@ -95,6 +95,11 @@ def fill_slide(slide, spec):
             else:
                 _set_text(placeholder, text=body)
 
+    # Speaker notes — the talk track behind the slide (presenter view / printouts).
+    notes = spec.get("notes")
+    if notes:
+        slide.notes_slide.notes_text_frame.text = notes
+
 
 def _remove_all_slides(prs):
     slide_id_list = prs.slides._sldIdLst
