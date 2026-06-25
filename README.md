@@ -10,6 +10,35 @@ Most "AI deck generators" impose their own look and can't ingest a locked corpor
 template. These do the opposite: they open *your* `.pptx`/`.potx` and pour Claude-written
 content into its real layouts.
 
+## Features
+
+- **Uses your real template, not a theme clone.** Slides are built from the template's own
+  layouts and masters, so logos, brand bars, fonts, colors, and background graphics are the
+  genuine article — the output *is* the template with content poured into its placeholders.
+- **Context-driven drafting.** Claude grounds the deck in whatever you give it — meeting /
+  Zoom / Gong notes, call transcripts, client background, email threads, and the deal
+  context (see [Context it can ingest](#context-it-can-ingest)).
+- **Audience personas.** Tone, depth, length, and slide emphasis tune to the audience:
+  **Executive**, **CISO**, **Technical deep-dive**, or **Discovery**. Claude infers one from
+  your brief or you pick.
+- **Speaker notes.** Each slide can carry a `notes` talk-track written into the slide's
+  notes pane (presenter view / printouts) — the "why this slide, say this" track.
+- **Learns your layout conventions.** Point `deck-theme-setup` at a few past decks and it
+  infers which layout you use for which kind of slide (title, agenda, problem, solution,
+  case-study, ROI, next-steps, thank-you…) and saves it as a role→layout map.
+- **Multiple template variants.** Register more than one template (e.g. a light and a dark
+  deck) and pick the variant per build.
+- **Smart layout fallback.** A slide whose role has no learned preference falls back to a
+  body-bearing layout, then to the first layout — so a deck always renders.
+- **Auto-fit text.** Long bullets/body auto-shrink to fit their placeholder.
+- **Iterative edits.** "Make slide 4 two-column," "shorten it for execs," "add an ROI
+  slide from these numbers" → Claude re-drafts and regenerates.
+- **Template validation.** Setup checks the file is a real `.pptx`/`.potx` and warns when a
+  managed/DLP browser may have encrypted it in transit.
+- **Fully local & private.** No web app, no third-party SaaS, no AI image generation, no
+  internet or local LLM required — Claude writes the content and `python-pptx` renders it.
+  Your template and config never leave your machine and are gitignored.
+
 ## How it works
 
 ```
@@ -61,6 +90,27 @@ You never run the scripts yourself — talk to Claude and it runs them.
    Claude picks the CISO persona, drafts the slides, and writes a `.pptx` into `decks/`.
 3. **Iterate:** *"make slide 4 two-column"* / *"shorten it for execs"* → it re-drafts and
    regenerates.
+
+### Context it can ingest
+
+A presales/sales deck is only as good as the context behind it, so `deck-builder` actively
+pulls in everything you can give it and folds it into the narrative. Provide any of these as
+**pasted text** or a **local file path** (`.txt` / `.md` / `.docx` / `.pdf` — it reads the
+file):
+
+- **Meeting / Zoom / Gong call notes or transcripts** — it extracts the prospect's stated
+  pains, priorities, quotes, objections, who was in the room, and any commitments made.
+- **Client background** — industry, size, recent news, regulatory pressures, tech stack,
+  competitors, and current vendors.
+- **Email threads** — the ask, the timeline, the stakeholders and their roles.
+- **The opportunity** — deal stage (discovery / eval / business case / negotiation), the
+  champion, the economic buyer, success criteria, and the next step you're driving toward.
+- **Prior decks or one-pagers** you want to draw from.
+
+The more specific the input is to *this* client and *this* conversation, the better the
+deck. With little context, Claude asks 2–3 sharp qualifying questions and proceeds. (There
+is no live Zoom/Gong integration — paste the notes or pass a file path; it doesn't fetch
+recordings from the cloud.)
 
 ### Or run the scripts directly
 
